@@ -40,7 +40,6 @@ def get_mnist_model():
     model = tf.keras.models.load_model(model_path)
     return model, f"Modelo cargado exitosamente desde: {model_path}"
   else:
-    # Entrenar un modelo ligero rápidamente si no existe el archivo h5
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
@@ -96,11 +95,10 @@ st.markdown(
 
 st.markdown("### 🎨 Dibuja un dígito del 0 al 9")
 
-# Columnas para organizar el lienzo y los controles
 col_canvas, col_controls = st.columns([1.2, 1])
 
 with col_canvas:
-  # Lienzo de dibujo interactivo con fondo negro e trazo blanco
+  # Lienzo con update_streamlit=True para evitar el error de lectura de datos
   canvas_result = st_canvas(
       fill_color="#000000",
       stroke_width=18,
@@ -109,29 +107,24 @@ with col_canvas:
       width=280,
       height=280,
       drawing_mode="freedraw",
+      update_streamlit=True,
       key="canvas",
   )
 
 with col_controls:
   st.markdown("### 🎮 Controles")
   predecir_btn = st.button("🔍 Predecir")
-  # Streamlit-drawable-canvas incluye botones nativos de limpiar abajo, pero podemos añadir lógica extra si se requiere
 
 # --- PROCESAMIENTO Y PREDICCIÓN ---
 if predecir_btn:
   if canvas_result.image_data is not None:
-    # Obtener la imagen dibujada y convertirla a escala de grises
     img_array = canvas_result.image_data.astype("uint8")
     img_pil = Image.fromarray(img_array).convert("L")
-
-    # Redimensionar a 28x28 píxeles tal como espera MNIST
     img_resized = img_pil.resize((28, 28))
 
-    # Normalizar valores entre 0 y 1
     img_normalized = np.array(img_resized) / 255.0
     img_reshaped = img_normalized.reshape(1, 28, 28)
 
-    # Realizar predicción con el modelo
     predictions = model.predict(img_reshaped)
     digito_predicho = np.argmax(predictions[0])
     confianza = np.max(predictions[0]) * 100
