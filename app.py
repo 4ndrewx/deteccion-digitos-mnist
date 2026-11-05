@@ -98,7 +98,7 @@ st.markdown("### 🎨 Dibuja un dígito del 0 al 9")
 col_canvas, col_controls = st.columns([1.2, 1])
 
 with col_canvas:
-  # Lienzo con update_streamlit=True para evitar el error de lectura de datos
+  # Lienzo con return_image_data=True y update_streamlit=True
   canvas_result = st_canvas(
       fill_color="#000000",
       stroke_width=18,
@@ -108,6 +108,7 @@ with col_canvas:
       height=280,
       drawing_mode="freedraw",
       update_streamlit=True,
+      return_image_data=True,
       key="canvas",
   )
 
